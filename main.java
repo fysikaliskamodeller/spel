@@ -10,7 +10,7 @@ public class main {
 	{
 		JFrame f = new JFrame();
 		TestJPanel t = new TestJPanel();
-		t.setBackground(Color.YELLOW);
+		t.setBackground(new Color(100, 34, 100));
 		f.add(t);
 		
 		f.setVisible(true);

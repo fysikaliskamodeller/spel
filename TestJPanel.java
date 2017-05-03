@@ -7,24 +7,37 @@ import java.awt.geom.*;
 
 public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	
-	Timer t = new Timer(5, this);
-	double x = 650, y = 20, velx = 0.0, vely = 0.0, xball = 600, yball = 200, velyball = 0.0, velxball = 0.0;
-	Rectangle2D [] rectangles = new Rectangle2D [3];
+	//github.com/narbuvold/physics-lecture
+	Timer t = new Timer(17, this);
+	double x = 70, y = 480, velx = 0.0, vely = 0.0, xball = 100, yball = 495, velyball = 0.0, velxball = 0.0, xbound1 = 0.0, xbound2 = 780;
+	Rectangle2D [] rectangles = new Rectangle2D [10];
+	Rectangle2D [] recthori = new Rectangle2D [5];
 	private Rectangle2D player = new Rectangle((int)x, (int)y, 40, 40);
-	private Rectangle2D rect2 = new Rectangle(600, 300, 200, 30);
-	private Rectangle2D rect3 = new Rectangle(0, 560, 800, 20);
-	private Rectangle2D rect4 = new Rectangle(0, 0, 800, 20);
+	private Rectangle2D rect2 = new Rectangle(600, 150, 300, 30); //floor middle
+	private Rectangle2D rect3 = new Rectangle(60, 520, 600, 60); //floor bottom
+	private Rectangle2D rect4 = new Rectangle(120, 0, 620, 20); // roof
+	private Rectangle2D rect5 = new Rectangle(720, 520, 100, 60);
+	private Rectangle2D rect7 = new Rectangle(50, 0, 20, 700); 
+	private Rectangle2D rect6 = new Rectangle(600, 65, 20, 60); //1
+	private Rectangle2D rect8 = new Rectangle(450, 65, 150, 20); //2
+	private Rectangle2D rect9 = new Rectangle(450, 65, 20, 300); //3
+	private Rectangle2D rect10 = new Rectangle(450, 365, 300, 20); //4
+	private Rectangle2D rect11 = new Rectangle(750, 365, 100, 20); //5
+	private Rectangle2D rect12 = new Rectangle(50, 150, 350, 20);
+
+
 	private Ellipse2D ball = new Ellipse2D.Double(yball, xball, 20, 20);
 
 	private double maxvely = 10;
-	private double gravity = 0.05;
-	private double massplayer = 10;
-	private double massball = 10;
-	private double friction = 0.01;
+	private double gravity = 0.5;
+	private double massplayer = 50;
+	private double massball = 20;
+	private double friction = 0.4;
 	private double speed = 0;
 	private double fake = 0;
-	private boolean push = true;
-	
+	private double dt = 0.5;
+	private boolean test = false;
+	public int counter = 0;
 	
 	public TestJPanel()
 	{
@@ -36,6 +49,20 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		rectangles[0] = rect2;
 		rectangles[1] = rect3;
 		rectangles[2] = rect4;
+		rectangles[3] = rect5;
+		rectangles[4] = rect6;
+		rectangles[5] = rect7;
+		rectangles[6] = rect8;
+		rectangles[7] = rect9;
+		rectangles[8] = rect10;
+		rectangles[9] = rect12;
+		
+		//horizontal 
+		recthori[0] = rect3;
+		recthori[1] = rect5;
+		recthori[2] = rect6;
+		recthori[3] = rect9;
+		recthori[4] = rect7;
 		
 		
 	}
@@ -47,11 +74,20 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		g2.setColor(Color.BLUE);
 		//player
 		g2.fill(player = new Rectangle((int)x, (int)y, 40, 40));
-		g2.setColor(Color.BLACK);
+		g2.setColor(new Color(11, 139, 34));
 		//field
 		g2.fill(rect2);
 		g2.fill(rect3);
 		g2.fill(rect4);
+		g2.fill(rect5);
+		g2.fill(rect6);
+		g2.fill(rect7);
+		g2.fill(rect8);
+		g2.fill(rect9);
+		g2.fill(rect10);
+		g2.fill(rect12);
+		g2.setColor(Color.RED);
+		g2.fill(rect11);
 		//moving ball
 		g2.fill(ball = new Ellipse2D.Double(xball, yball, 20, 20));
 		
@@ -61,7 +97,11 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	public void actionPerformed(ActionEvent e)
 	{
 	
+		
+	
+	hole();
 	ballCollision();
+	
 	if(nextMove() == true)
 	{
 		x = x;
@@ -83,9 +123,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	xball += velxball;
 	yball += velyball;
 	}
-	
-	fall(); //Tittar vi faller
-		
+	fall();
 	if(x < 0.0) //dessa håller spelaren och bollen på banan
 	{
 		x = 0.0;
@@ -94,57 +132,44 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	{
 		x = 760;
 	}
-	if(y < 0.0)
-	{
-		y = 0;
-	}
-	
 	if(xball < 0.0)
 	{
 		xball = 0.0;
 	}
-	if(xball > 760)
+	if(xball > 780)
 	{
-		xball = 760;
+		xball = 780;
 	}
-	if(yball < 0.0)
-	{
-		yball = 0;
-	}
-	
-		
-		
+	counter++;
 		repaint();
 	}
 	
-	public void up()
+	public void jump()
 	{
 		if(gravity > 0)
 		{
-		vely = -2.5;
+		vely = -5.0;
 		}
 		else
 		{
-			vely = 2.5;
+			vely = 5.0;
 		}
 	}
-	public void down()
-	{
-		vely = 1.5;
-		
-	}
+	
 	public void left()
 	{
 		
-		velx = -1.5;
+		velx = -5.0;
 	}
 	public void right()
 	{
 		
-		velx = 1.5;
+		velx = 5.0;
 	}
-	public void gravityswitch()
+	public void gravitySwitch()
 	{
+		
+		
 		if(gravity > 0)
 		{
 		gravity = -Math.abs(gravity);
@@ -167,14 +192,12 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
+		test = true;
 		if(e.getKeyCode() == KeyEvent.VK_SPACE)
 		{
-			up();
+			jump();
 		}
-	 	if(e.getKeyCode() == KeyEvent.VK_DOWN)
-		{
-			down();
-		}
+	 	
 	 	if(e.getKeyCode() == KeyEvent.VK_LEFT)
 		{
 			left();
@@ -187,7 +210,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		}
 	 	if(e.getKeyCode() == KeyEvent.VK_G)
 	 	{
-	 		gravityswitch();
+	 		gravitySwitch();
 	 	}
 		
 	}
@@ -195,6 +218,8 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
+		
+		
 		if(e.getKeyCode() == KeyEvent.VK_UP)
 		{
 			vely = 0;
@@ -205,20 +230,18 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			vely = 0;
 			
 		}
+	
 		if(e.getKeyCode() == KeyEvent.VK_LEFT)
 		{
 			velx = 0;
-			
 			
 		}
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT)
 		{
 			velx = 0;
 			
-			
+		
 		}
-		
-		
 		
 	}
 	
@@ -236,9 +259,33 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		}
 		
 		}
-		return false;
-		
+		return false;	
 	}
+	
+	public boolean playerInAir()
+	{
+		double decider = 0;
+		if(gravity > 0)
+		{
+			decider = 2;
+		}
+		if(gravity < 0)
+		{
+			decider = -2;
+		}
+		double newy = y + decider;
+		Rectangle2D fakerect = new Rectangle((int) x, (int) newy, 40, 40);
+		for(Rectangle2D item : rectangles)
+		{
+		if(fakerect.getBounds2D().intersects(item.getBounds2D()))
+		{
+			return false;	
+		}
+		
+		}
+		return true;
+	}
+	
 	public boolean nextBallMove()
 	{
 		double newx = xball + velxball;
@@ -265,25 +312,68 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		if(gravity < 0)
 			fdecider = -2;
 		double newy = yball + fdecider;
-		Ellipse2D fakecircle = new Ellipse2D.Double(x, newy, 20, 20);
+		Ellipse2D fakecircle = new Ellipse2D.Double(xball, newy, 20, 20);
 		for(Rectangle2D item : rectangles)
 		{
 			if(fakecircle.getBounds2D().intersects(item.getBounds2D()))
 			{
-				friction = 0.1;
+				friction = 2.5;
 			}
 		}
 		
 	}
+	public void hole()
+	{
+		if(x >= 670 && x <= 720 && y >=580 )
+		{
+			x = 760;
+			y = -50;
+			vely = 0;
+		}
+		if(xball >= 660 && xball <= 740 && yball >= 580)
+		{
+			xball = 770;
+			yball = 0;
+			velyball = 0;
+		}
+		//le(750, 365, 100, 20);
+		if(xball >= 750 && yball >= 365 && yball <= 370)
+		{
+			gravitySwitch();
+			velxball = 0;
+			xball = 5;
+			yball = 700;
+		}
+		if(xball == 5 && yball <= -5)
+		{
+			velyball = 0;
+			yball = -10;
+			xball = 80;
+			gravitySwitch();
+		}
+	}
 	
+	public void horizontalBounce()
+	{
+		if(xball == xbound1 || xball == xbound2)
+		{
+			velxball = -velxball;
+		}	
+		for(Rectangle2D item : recthori)
+		{
+			if(ball.getBounds2D().intersects(item.getBounds2D()))
+			{
+				velxball = -velxball;
+			}
+			
+		}
+	}
+	
+	
+
 	
 	public void ballCollision()
 	{
-		//v = v0 -a*t
-		//a = Fnet/m = b*v/m // m=1 b = 0.2
-		//d=1/2at^2+vit
-		
-		
 		
 		if(player.getBounds2D().intersects(ball.getBounds2D()))
 		{
@@ -291,27 +381,28 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			xball = xball + velx;
 		}
 		
-		{
+		
+		horizontalBounce();
 		if(velxball > 0)
 		{
 			ballOnFloor();
-			velxball = (velxball - (friction/(2*massball)));
-			xball += velxball;
+			velxball = velxball - friction/(massball)*dt;
+			xball += velxball*dt;
 		}
 		if(velxball < 0)
 		{
 			ballOnFloor();
-			velxball = velxball + friction/(2*massball);
-			xball += velxball;
+			velxball = velxball + friction/(massball)*dt;
+			xball += velxball*dt;
 		}
-		if( 0.01 > velxball && velxball > -0.01)
+		if(0.1 > velxball && velxball > -0.1)
 		{
 			velxball = 0;
 		}
 		 fake = velx;
 		}
 		
-	}
+	
 	
 	public void fall()
 	{
