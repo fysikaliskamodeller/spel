@@ -1,30 +1,37 @@
 package Game_1;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
 
 public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	
 	//github.com/narbuvold/physics-lecture
 	Timer t = new Timer(17, this);
-	double x = 70, y = 480, velx = 0.0, vely = 0.0, xball = 100, yball = 495, velyball = 0.0, velxball = 0.0, xbound1 = 0.0, xbound2 = 780;
-	Rectangle2D [] rectangles = new Rectangle2D [10];
-	Rectangle2D [] recthori = new Rectangle2D [5];
+	double x = 200, y = 480, velx = 0.0, vely = 0.0, xball = 150, yball = 495, velyball = 0.0, velxball = 0.0, xbound1 = 0.0, xbound2 = 780;
+	Rectangle2D [] rectangles = new Rectangle2D [13];
+	Rectangle2D [] recthori = new Rectangle2D [6];
 	private Rectangle2D player = new Rectangle((int)x, (int)y, 40, 40);
 	private Rectangle2D rect2 = new Rectangle(600, 150, 300, 30); //floor middle
-	private Rectangle2D rect3 = new Rectangle(60, 520, 600, 60); //floor bottom
+	private Rectangle2D rect3 = new Rectangle(60, 520, 400, 60); //floor bottom
 	private Rectangle2D rect4 = new Rectangle(120, 0, 620, 20); // roof
-	private Rectangle2D rect5 = new Rectangle(720, 520, 100, 60);
+	private Rectangle2D rect5 = new Rectangle(710, 520, 100, 60);
 	private Rectangle2D rect7 = new Rectangle(50, 0, 20, 700); 
 	private Rectangle2D rect6 = new Rectangle(600, 65, 20, 60); //1
 	private Rectangle2D rect8 = new Rectangle(450, 65, 150, 20); //2
 	private Rectangle2D rect9 = new Rectangle(450, 65, 20, 300); //3
 	private Rectangle2D rect10 = new Rectangle(450, 365, 300, 20); //4
 	private Rectangle2D rect11 = new Rectangle(750, 365, 100, 20); //5
-	private Rectangle2D rect12 = new Rectangle(50, 150, 350, 20);
-
+	private Rectangle2D rect12 = new Rectangle(50, 150, 300, 20); //6
+	private Rectangle2D rect13 = new Rectangle(50, 410, 550, 20); //7
+	private Rectangle2D rect14 = new Rectangle(520, 520, 130, 60); //8
+	private Rectangle2D rect15 = new Rectangle(650, 560, 60, 20);
 
 	private Ellipse2D ball = new Ellipse2D.Double(yball, xball, 20, 20);
 
@@ -37,8 +44,11 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	private double fake = 0;
 	private double dt = 0.5;
 	private boolean test = false;
-	public int counter = 0;
-	
+	public int counter = 37;
+	private Color color = Color.GREEN;
+	private BufferedImage playerim;
+	private BufferedImage goalflag;
+	private BufferedImage flippedgoalflag;
 	public TestJPanel()
 	{
 		
@@ -56,6 +66,9 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		rectangles[7] = rect9;
 		rectangles[8] = rect10;
 		rectangles[9] = rect12;
+		rectangles[10] = rect13;
+		rectangles[11] = rect14;
+		rectangles[12] = rect15;
 		
 		//horizontal 
 		recthori[0] = rect3;
@@ -63,7 +76,17 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		recthori[2] = rect6;
 		recthori[3] = rect9;
 		recthori[4] = rect7;
+		recthori[5] = rect14;
 		
+		 try {
+	         playerim = ImageIO.read(new File(FileSystems.getDefault().getPath("GlowingNugget.png").toUri()));
+	         goalflag = ImageIO.read(new File(FileSystems.getDefault().getPath("goalflag.png").toUri()));
+	         flippedgoalflag = ImageIO.read(new File(FileSystems.getDefault().getPath("flippedgoalflag.png").toUri()));
+	     } catch (IOException e) {
+	         System.out.println("Image not found");
+	         playerim = new BufferedImage(40, 40, BufferedImage.TYPE_3BYTE_BGR);
+	         goalflag = new BufferedImage(40, 40, BufferedImage.TYPE_3BYTE_BGR);
+	     }
 		
 	}
 	
@@ -71,10 +94,15 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	{
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
+		
 		g2.setColor(Color.BLUE);
-		//player
+		//player 710, 520, 100, 60);
 		g2.fill(player = new Rectangle((int)x, (int)y, 40, 40));
-		g2.setColor(new Color(11, 139, 34));
+		g2.fill(ball = new Ellipse2D.Double(xball, yball, 20, 20));
+		g2.drawImage(playerim, (int)x, (int)y, 40, 40, null);
+		g2.drawImage(goalflag, 710, 450, 70, 70, null);
+		g2.drawImage(flippedgoalflag, 70, 170, 70, 70, null);
+		g2.setColor(Color.MAGENTA);
 		//field
 		g2.fill(rect2);
 		g2.fill(rect3);
@@ -86,18 +114,40 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		g2.fill(rect9);
 		g2.fill(rect10);
 		g2.fill(rect12);
-		g2.setColor(Color.RED);
+		g2.fill(rect13);
+		g2.fill(rect14);
+		g2.setColor(Color.WHITE);
+		g2.fill(rect15);
+		g2.setColor(color);
 		g2.fill(rect11);
 		//moving ball
-		g2.fill(ball = new Ellipse2D.Double(xball, yball, 20, 20));
+		
 		
 		
 		
 	}
 	public void actionPerformed(ActionEvent e)
 	{
-	
+	if(ballPlayerCollision() == true && nextBallMove() == true)
+	{	
+		velx = 0;
+		velxball = 0;
+	}
+	if(playerInAir() == false && test == true)
+	{
+		velx = 0;
+		test = false;
+	}
+	if(playerInAir() == true && nextMove() == true)
+	{
+		velx = 0;
+	}
+	if(playerInAir() == true && nextMove() == true)
+	{
+		x = x;
+		y = y + vely;
 		
+	}
 	
 	hole();
 	ballCollision();
@@ -107,6 +157,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		x = x;
 		y = y;
 	}
+	
 	else
 	{
 		x += velx;
@@ -124,6 +175,8 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	yball += velyball;
 	}
 	fall();
+	
+	
 	if(x < 0.0) //dessa håller spelaren och bollen på banan
 	{
 		x = 0.0;
@@ -173,12 +226,12 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		if(gravity > 0)
 		{
 		gravity = -Math.abs(gravity);
-		
+		color = Color.RED;
 		}
 		else if(gravity < 0)
 		{
 			gravity = Math.abs(gravity);
-			
+		color = Color.GREEN;
 		}
 		
 	}
@@ -192,7 +245,8 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
-		test = true;
+		if(playerInAir() == false)
+		{
 		if(e.getKeyCode() == KeyEvent.VK_SPACE)
 		{
 			jump();
@@ -201,6 +255,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	 	if(e.getKeyCode() == KeyEvent.VK_LEFT)
 		{
 			left();
+			
 			
 		}
 	 	if(e.getKeyCode() == KeyEvent.VK_RIGHT)
@@ -212,7 +267,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	 	{
 	 		gravitySwitch();
 	 	}
-		
+		}
 	}
 
 	@Override
@@ -233,14 +288,28 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	
 		if(e.getKeyCode() == KeyEvent.VK_LEFT)
 		{
-			velx = 0;
-			
+		if(playerInAir() == false)
+		{
+		
+		velx = 0;
+			}
+			else
+			{
+				test = true;
+			}
 		}
+		
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT)
 		{
-			velx = 0;
-			
+			if(playerInAir() == false)
+			{
 		
+			velx = 0;
+			}
+			else
+			{
+				test = true;
+			}
 		}
 		
 	}
@@ -262,6 +331,25 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		return false;	
 	}
 	
+	public boolean ballPlayerCollision()
+	{
+		double decider = 0;
+		if(velx > 0)
+		decider = xball + 2;
+		if(velx < 0)
+		decider = xball - 2;
+		Ellipse2D fakeball = new Ellipse2D.Double(decider, yball, 20, 20);
+		if(player.getBounds2D().intersects(fakeball.getBounds2D()))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		
+	}
+	
 	public boolean playerInAir()
 	{
 		double decider = 0;
@@ -279,7 +367,9 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		{
 		if(fakerect.getBounds2D().intersects(item.getBounds2D()))
 		{
-			return false;	
+			
+			return false;
+			
 		}
 		
 		}
@@ -324,19 +414,21 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	}
 	public void hole()
 	{
-		if(x >= 670 && x <= 720 && y >=580 )
+		if(x >= 460 && x <= 580 && y >=580 )
 		{
-			x = 760;
-			y = -50;
+			velx = 0;
+			x = 740;
+			y = -30;
 			vely = 0;
 		}
-		if(xball >= 660 && xball <= 740 && yball >= 580)
+		if(xball >= 400 && xball <= 600 && yball >= 580)
 		{
-			xball = 770;
+			xball = 740;
 			yball = 0;
 			velyball = 0;
+			velxball = Math.abs(velxball+2);
 		}
-		//le(750, 365, 100, 20);
+		
 		if(xball >= 750 && yball >= 365 && yball <= 370)
 		{
 			gravitySwitch();
@@ -349,6 +441,13 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			velyball = 0;
 			yball = -10;
 			xball = 80;
+			gravitySwitch();
+		}
+		//650, 560, 60, 20)
+		if(xball >= 650 && xball <= 710 && yball == 540.0 && velyball == 0 && velxball == 0)
+		{
+			yball = 540.7;
+			velyball = 0;
 			gravitySwitch();
 		}
 	}
@@ -410,6 +509,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	
 			vely += gravity;
 			velyball += gravity;
+			double fake = vely;
 			if(vely >= maxvely)
 			{
 				vely = maxvely;
@@ -418,12 +518,17 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			{
 				velyball = maxvely;
 			}
-		
-		if(nextMove() == true)
-		{
-			vely = 0;
 			
-		}
+			if(nextMove() == true)
+			{
+				vely = 0;	
+			}
+			if(nextMove() == true && playerInAir() == true)
+			{
+			vely = fake;	
+			}
+		
+		
 		if(nextBallMove() == true)
 		{
 			velyball = 0;

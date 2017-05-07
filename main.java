@@ -6,11 +6,12 @@ import javax.swing.JFrame;
 
 public class main {
 	
+	
 	public static void main(String [] args)
 	{
 		JFrame f = new JFrame();
 		TestJPanel t = new TestJPanel();
-		t.setBackground(new Color(100, 34, 100));
+		t.setBackground(new Color(10, 34, 100));
 		f.add(t);
 		
 		f.setVisible(true);
