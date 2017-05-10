@@ -14,37 +14,46 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	
 	//github.com/narbuvold/physics-lecture
 	Timer t = new Timer(17, this);
-	double x = 200, y = 480, velx = 0.0, vely = 0.0, xball = 150, yball = 495, velyball = 0.0, velxball = 0.0, xbound1 = 0.0, xbound2 = 780;
+	double x = 550, y = 20, velx = 0.0, vely = 0.0, xball = 490, yball = 20, velyball = 0.0, velxball = 0.0, xbound1 = 0.0, xbound2 = 780;
 	Rectangle2D [] rectangles = new Rectangle2D [13];
 	Rectangle2D [] recthori = new Rectangle2D [6];
 	private Rectangle2D player = new Rectangle((int)x, (int)y, 40, 40);
 	private Rectangle2D rect2 = new Rectangle(600, 150, 300, 30); //floor middle
 	private Rectangle2D rect3 = new Rectangle(60, 520, 400, 60); //floor bottom
-	private Rectangle2D rect4 = new Rectangle(120, 0, 620, 20); // roof
+	private Rectangle2D rect4 = new Rectangle(140, 0, 590, 20); // roof
 	private Rectangle2D rect5 = new Rectangle(710, 520, 100, 60);
-	private Rectangle2D rect7 = new Rectangle(50, 0, 20, 700); 
+	private Rectangle2D rect7 = new Rectangle(40, 0, 20, 700); 
 	private Rectangle2D rect6 = new Rectangle(600, 65, 20, 60); //1
 	private Rectangle2D rect8 = new Rectangle(450, 65, 150, 20); //2
 	private Rectangle2D rect9 = new Rectangle(450, 65, 20, 300); //3
 	private Rectangle2D rect10 = new Rectangle(450, 365, 300, 20); //4
 	private Rectangle2D rect11 = new Rectangle(750, 365, 100, 20); //5
 	private Rectangle2D rect12 = new Rectangle(50, 150, 300, 20); //6
-	private Rectangle2D rect13 = new Rectangle(50, 410, 550, 20); //7
+	private Rectangle2D rect13 = new Rectangle(50, 410, 520, 20); //7
 	private Rectangle2D rect14 = new Rectangle(520, 520, 130, 60); //8
 	private Rectangle2D rect15 = new Rectangle(650, 560, 60, 20);
 
 	private Ellipse2D ball = new Ellipse2D.Double(yball, xball, 20, 20);
 
 	private double maxvely = 10;
-	private double gravity = 0.5;
+	private double gravity = 0.4;
 	private double massplayer = 50;
-	private double massball = 20;
+	private double massball = 50;
 	private double friction = 0.4;
-	private double speed = 0;
 	private double fake = 0;
 	private double dt = 0.5;
+	//F = (1/2)*C*p*A*v^2
+	private double velocity = 0;
+	private double angle = 0;
+	private double forceair = 0;
+	//luftmotståndskoefficient
+	private double C = 0.02;
+	//luftdensitet
+	private double p = 0.1;
+	
+	
+	
 	private boolean test = false;
-	public int counter = 37;
 	private Color color = Color.GREEN;
 	private BufferedImage playerim;
 	private BufferedImage goalflag;
@@ -128,7 +137,17 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	}
 	public void actionPerformed(ActionEvent e)
 	{
-	if(ballPlayerCollision() == true && nextBallMove() == true)
+		//yball == 541 && xball >= 650 && xball <= 710 && x >=70 && x <= 50 && y >= 170 && y <= 200
+		if (x >= 70 && x<=140 && y >= 170 && y<=210 && xball >= 650 && xball <= 750 && yball >= 530) {
+			if (JOptionPane.showConfirmDialog(null, "Grattis du vann!  Vill du starta om?", "Victory", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                main.reset();
+            }else {
+                System.exit(0);
+            }
+		}
+
+		
+	if(ballPlayerCollision())
 	{	
 		velx = 0;
 		velxball = 0;
@@ -157,7 +176,11 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		x = x;
 		y = y;
 	}
-	
+	else if(ballPlayerCollision() == true)
+	{
+		x = x;
+		xball = xball;
+	}
 	else
 	{
 		x += velx;
@@ -193,7 +216,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	{
 		xball = 780;
 	}
-	counter++;
+	
 		repaint();
 	}
 	
@@ -333,20 +356,28 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	
 	public boolean ballPlayerCollision()
 	{
+		double balldecider = 0;
 		double decider = 0;
 		if(velx > 0)
-		decider = xball + 2;
+		{
+		balldecider = xball - 2;
+		decider = x - 2;
+		}
 		if(velx < 0)
-		decider = xball - 2;
-		Ellipse2D fakeball = new Ellipse2D.Double(decider, yball, 20, 20);
-		if(player.getBounds2D().intersects(fakeball.getBounds2D()))
+		{
+		balldecider = xball + 2;
+		decider = x + 2;
+		}
+		Rectangle2D fakerect = new Rectangle((int) decider, (int) y , 40, 40);
+		Ellipse2D fakeball = new Ellipse2D.Double(balldecider, yball, 20, 20);
+		for(Rectangle2D item : recthori)
+		{
+		if(fakerect.getBounds2D().intersects(fakeball.getBounds2D()) && fakeball.getBounds2D().intersects(item.getBounds2D()))
 		{
 			return true;
 		}
-		else
-		{
-			return false;
 		}
+			return false;
 		
 	}
 	
@@ -393,7 +424,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		return false;
 		
 	}
-	public void ballOnFloor()
+	public boolean ballOnFloor()
 	{
 		friction = 0;
 		double fdecider = 0;
@@ -407,9 +438,11 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		{
 			if(fakecircle.getBounds2D().intersects(item.getBounds2D()))
 			{
-				friction = 2.5;
+				friction = 5;
+				return true;
 			}
 		}
+		return false;
 		
 	}
 	public void hole()
@@ -423,10 +456,10 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		}
 		if(xball >= 400 && xball <= 600 && yball >= 580)
 		{
-			xball = 740;
-			yball = 0;
+			xball = 730;
+			yball = -20;
 			velyball = 0;
-			velxball = Math.abs(velxball+2);
+			velxball = Math.abs(velxball)-2;
 		}
 		
 		if(xball >= 750 && yball >= 365 && yball <= 370)
@@ -440,13 +473,13 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		{
 			velyball = 0;
 			yball = -10;
-			xball = 80;
+			xball = 110;
 			gravitySwitch();
 		}
 		//650, 560, 60, 20)
-		if(xball >= 650 && xball <= 710 && yball == 540.0 && velyball == 0 && velxball == 0)
+		if(xball >= 650 && xball <= 710 && yball >=539 && yball < 540 && velyball == 0 && velxball == 0)
 		{
-			yball = 540.7;
+			yball = 541;
 			velyball = 0;
 			gravitySwitch();
 		}
@@ -467,6 +500,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			
 		}
 	}
+
 	
 	
 
@@ -493,6 +527,24 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			ballOnFloor();
 			velxball = velxball + friction/(massball)*dt;
 			xball += velxball*dt;
+			
+		}
+		if(ballOnFloor() == false && velxball != 0)
+		{
+			//luftmotstånd:
+			//F = (1/2)*C*p*A*v^2
+			//a = F/m
+			//används för att räkna ut vinkeln och friktionskraften
+			velocity = Math.sqrt(Math.pow(velxball, 2) + Math.pow(velyball, 2));
+			angle = Math.acos(velxball/velocity);
+			//F = (1/2)*C*p*A*v^2
+			//a = F/m
+			
+			forceair = ((0.5*C*p*(Math.pow((ball.getHeight()/2), 2) * Math.PI)*velocity)/massball);
+			
+			velxball = velxball - Math.cos(angle)*forceair*dt;
+			velyball = velyball - Math.sin(angle)*forceair*dt;
+			System.out.println(velxball);
 		}
 		if(0.1 > velxball && velxball > -0.1)
 		{
