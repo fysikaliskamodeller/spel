@@ -14,7 +14,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	
 	//github.com/narbuvold/physics-lecture
 	Timer t = new Timer(17, this);
-	double x = 100, y = 430, velx = 0.0, vely = 0.0, xball = 200, yball = 430, velyball = 0.0, velxball = 0.0, xbound1 = 0.0, xbound2 = 780;
+	double x = 100, y = 435, velx = 0.0, vely = 0.0, xball = 200, yball = 430, velyball = 0.0, velxball = 0.0, xbound1 = 0.0, xbound2 = 780;
 	Rectangle2D [] rectangles = new Rectangle2D [14];
 	Rectangle2D [] recthori = new Rectangle2D [7];
 	private Rectangle2D player = new Rectangle((int)x, (int)y, 40, 40);
@@ -28,7 +28,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	private Rectangle2D rect9 = new Rectangle(450, 65, 20, 300); //3
 	private Rectangle2D rect10 = new Rectangle(450, 365, 350, 20); //4
 	private Rectangle2D rect11 = new Rectangle(770, 180, 30, 185); //5
-	private Rectangle2D rect12 = new Rectangle(50, 150, 300, 20); //6
+	private Rectangle2D rect12 = new Rectangle(40, 150, 310, 20); //6
 	private Rectangle2D rect13 = new Rectangle(50, 410, 520, 20); //7
 	private Rectangle2D rect14 = new Rectangle(520, 520, 130, 60); //8
 	private Rectangle2D rect15 = new Rectangle(650, 560, 60, 20);
@@ -37,7 +37,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	private Ellipse2D ball = new Ellipse2D.Double(yball, xball, 20, 20);
 
 	private double maxvely = 10;
-	private double gravity = 0.4;
+	public double gravity = 0.4;
 	private double massplayer = 50;
 	private double massball = 50;
 	private double friction = 0.4;
@@ -51,14 +51,27 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	private double C = 0.02;
 	//luftdensitet
 	private double p = 0.1;
+	private BufferedImage[] playerimage = new BufferedImage[4];
 	
 	
 	
 	private boolean test = false;
-	private Color color = Color.GREEN;
-	private BufferedImage playerim;
+	public Color color = Color.GREEN;
+	private BufferedImage pinguin;
+	private BufferedImage pinguinright;
+	private BufferedImage pinguinleft;
+	private BufferedImage pinguinflippedright;
+	private BufferedImage pinguinflippedleft;
 	private BufferedImage goalflag;
 	private BufferedImage flippedgoalflag;
+	private BufferedImage ballimage1;
+	private BufferedImage ballimage2;
+	private BufferedImage ballimage3;
+	private BufferedImage ballimage4;
+	private BufferedImage ballimage;
+	private double counter = 0;
+	private boolean facing = true;
+	public boolean restart = false;
 	public TestJPanel()
 	{
 		
@@ -66,6 +79,9 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		addKeyListener(this);
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
+		
+		
+		
 		rectangles[0] = rect2;
 		rectangles[1] = rect3;
 		rectangles[2] = rect4;
@@ -90,13 +106,21 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		recthori[5] = rect14;
 		recthori[6] = rect16;
 		 try {
-	         playerim = ImageIO.read(new File(FileSystems.getDefault().getPath("GlowingNugget.png").toUri()));
-	         goalflag = ImageIO.read(new File(FileSystems.getDefault().getPath("goalflag.png").toUri()));
+			 goalflag = ImageIO.read(new File(FileSystems.getDefault().getPath("goalflag.png").toUri()));
 	         flippedgoalflag = ImageIO.read(new File(FileSystems.getDefault().getPath("flippedgoalflag.png").toUri()));
+	         pinguinright = ImageIO.read(new File(FileSystems.getDefault().getPath("PinguinRight.png").toUri()));
+	         pinguinleft =  ImageIO.read(new File(FileSystems.getDefault().getPath("PinguinLeft.png").toUri()));
+	         pinguinflippedright =  ImageIO.read(new File(FileSystems.getDefault().getPath("PinguinFlippedRight.png").toUri()));
+	         pinguinflippedleft =  ImageIO.read(new File(FileSystems.getDefault().getPath("PinguinFlippedLeft.png").toUri()));
+	         ballimage1 = ImageIO.read(new File(FileSystems.getDefault().getPath("ball1.png").toUri()));
+	         ballimage2 = ImageIO.read(new File(FileSystems.getDefault().getPath("ball2.png").toUri()));
+	         ballimage3 = ImageIO.read(new File(FileSystems.getDefault().getPath("ball3.png").toUri()));
+	         ballimage4 = ImageIO.read(new File(FileSystems.getDefault().getPath("ball4.png").toUri()));
 	     } catch (IOException e) {
 	         System.out.println("Image not found");
-	         playerim = new BufferedImage(40, 40, BufferedImage.TYPE_3BYTE_BGR);
+	         pinguinright = new BufferedImage(40, 40, BufferedImage.TYPE_3BYTE_BGR);
 	         goalflag = new BufferedImage(40, 40, BufferedImage.TYPE_3BYTE_BGR);
+	         
 	     }
 		
 	}
@@ -106,13 +130,16 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 		
+		
 		g2.setColor(Color.BLUE);
 		g2.fill(ball = new Ellipse2D.Double(xball, yball, 20, 20));
+		g2.drawImage(ballimage, (int)xball, (int)yball, 21, 21, null);
 		//player 710, 520, 100, 60);
 		g2.setColor(new Color(10, 34, 100));
 		g2.fill(player = new Rectangle((int)x, (int)y, 40, 40));
 		
-		g2.drawImage(playerim, (int)x, (int)y, 40, 40, null);
+	//	pinguin = pinguinright;
+		g2.drawImage(pinguin, (int)x, (int)y, 40, 40, null);
 		g2.drawImage(goalflag, 705, 390, 70, 70, null);
 		g2.drawImage(flippedgoalflag, 70, 170, 70, 70, null);
 		g2.setColor(Color.MAGENTA);
@@ -142,13 +169,19 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	}
 	public void actionPerformed(ActionEvent e)
 	{
+		
 		//yball == 541 && xball >= 650 && xball <= 710 && x >=70 && x <= 50 && y >= 170 && y <= 200
-		if (x >= 70 && x<=140 && y >= 170 && y<=210 && xball >= 650 && xball <= 750 && yball >= 530) {
-			if (JOptionPane.showConfirmDialog(null, "Grattis du vann!  Vill du starta om?", "Victory", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+		if (x >= 70 && x<=140 && y >= 170 && y<=210 && xball >= 650 && xball <= 750 && yball >= 530 ) {
+			if (JOptionPane.showConfirmDialog(null, "Grattis du vann!  Vill du starta om?", "Victory", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION ) {
+				
 				main.reset();
             }else {
                 System.exit(0);
             }
+		}
+		if(restart == true)
+		{
+			main.reset();
 		}
 
 		
@@ -221,7 +254,49 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	{
 		xball = 780;
 	}
+	//facing player
+	if(velx >= 0 && facing == true)
+		pinguin = pinguinright;
+	if(velx <= 0 && facing == false)
+		pinguin = pinguinleft;
+	if(gravity < 0 && velx >= 0 && facing == true)
+		pinguin = pinguinflippedright;
+	if(gravity < 0 && velx <= 0 && facing == false)
+		pinguin = pinguinflippedleft;
 	
+	if(velxball < 0.5 && velxball > -0.5)
+		ballimage = ballimage1;
+	if(velxball > 0)
+	{
+		if(counter >= 0 && counter < 1)
+			ballimage = ballimage1;
+		if(counter >= 1 && counter < 2)
+			ballimage = ballimage2;
+		if(counter >= 2 && counter < 3)
+			ballimage = ballimage3;
+		if(counter >= 3 && counter < 4)
+			ballimage = ballimage4;
+		
+		counter = counter + 0.5;
+	}
+	
+	if(velxball < 0)
+	{
+		if(counter >= 0 && counter < 1)
+			ballimage = ballimage1;
+		if(counter >= 1 && counter < 3)
+			ballimage = ballimage4;
+		if(counter >= 2 && counter < 3)
+			ballimage = ballimage3;
+		if(counter >= 3 && counter < 4)
+			ballimage = ballimage2;
+		
+		counter = counter + 0.5;
+	}
+	if(counter == 4)
+		counter = 0;
+	
+		
 		repaint();
 	}
 	
@@ -239,12 +314,12 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	
 	public void left()
 	{
-		
+		facing = false;
 		velx = -5.0;
 	}
 	public void right()
 	{
-		
+		facing = true;
 		velx = 5.0;
 	}
 	public void gravitySwitch()
@@ -274,6 +349,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
+		
 		if(playerInAir() == false)
 		{
 		if(e.getKeyCode() == KeyEvent.VK_SPACE)
@@ -296,10 +372,10 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	 	{
 	 		gravitySwitch();
 	 	}
-		if(e.getKeyCode() == KeyEvent.VK_F)
+		if(e.getKeyCode() == KeyEvent.VK_R)
 		{
-			//main.reset();
-			
+			//restart = true;
+			main.reset();
 		}
 		}
 	}
@@ -308,9 +384,9 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
 		
-		if(e.getKeyCode() == KeyEvent.VK_F)
+		if(e.getKeyCode() == KeyEvent.VK_R)
 		{
-				
+			
 		}
 		if(e.getKeyCode() == KeyEvent.VK_UP)
 		{
@@ -468,16 +544,17 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			y = -30;
 			vely = 0;
 		}
-		if(xball >= 400 && xball <= 600 && yball >= 580)
+		if(xball >= 400 && xball <= 700 && yball >= 580)
 		{
-			xball = 740;
+			velxball = Math.abs(velxball)-2;
+			xball = 750;
 			yball = -30;
 			velyball = 0;
-			velxball = Math.abs(velxball)-2;
+		
 		}
 		
-		if(xball >= 740 && yball >= 300 && yball <= 365)
-		{
+		if(xball >= 740 && yball >= 180 && yball <= 365)
+		{//770, 180, 30, 185);
 			gravitySwitch();
 			velxball = 0;
 			xball = 5;
