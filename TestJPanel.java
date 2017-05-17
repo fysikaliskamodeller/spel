@@ -12,24 +12,23 @@ import java.nio.file.FileSystems;
 
 public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	
-	//github.com/narbuvold/physics-lecture
 	Timer t = new Timer(17, this);
 	double x = 100, y = 435, velx = 0.0, vely = 0.0, xball = 200, yball = 430, velyball = 0.0, velxball = 0.0, xbound1 = 0.0, xbound2 = 780;
 	Rectangle2D [] rectangles = new Rectangle2D [14];
 	Rectangle2D [] recthori = new Rectangle2D [7];
 	private Rectangle2D player = new Rectangle((int)x, (int)y, 40, 40);
 	private Rectangle2D rect2 = new Rectangle(600, 150, 300, 30); //floor middle
-	private Rectangle2D rect3 = new Rectangle(60, 520, 400, 60); //floor bottom
-	private Rectangle2D rect4 = new Rectangle(140, 0, 590, 20); // roof
+	private Rectangle2D rect3 = new Rectangle(50, 520, 410, 60); //floor bottom
+	private Rectangle2D rect4 = new Rectangle(140, 0, 570, 20); // roof
 	private Rectangle2D rect5 = new Rectangle(730, 520, 100, 60);
-	private Rectangle2D rect7 = new Rectangle(40, 0, 20, 700); 
+	private Rectangle2D rect7 = new Rectangle(30, 0, 40, 700); 
 	private Rectangle2D rect6 = new Rectangle(600, 65, 20, 60); //1
 	private Rectangle2D rect8 = new Rectangle(450, 65, 150, 20); //2
 	private Rectangle2D rect9 = new Rectangle(450, 65, 20, 300); //3
 	private Rectangle2D rect10 = new Rectangle(450, 365, 350, 20); //4
 	private Rectangle2D rect11 = new Rectangle(770, 180, 30, 185); //5
-	private Rectangle2D rect12 = new Rectangle(40, 150, 310, 20); //6
-	private Rectangle2D rect13 = new Rectangle(50, 410, 520, 20); //7
+	private Rectangle2D rect12 = new Rectangle(50, 150, 320, 20); //6
+	private Rectangle2D rect13 = new Rectangle(50, 410, 530, 20); //7
 	private Rectangle2D rect14 = new Rectangle(520, 520, 130, 60); //8
 	private Rectangle2D rect15 = new Rectangle(650, 560, 60, 20);
 	private Rectangle2D rect16 = new Rectangle(710, 460, 20, 150);
@@ -118,9 +117,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	         ballimage4 = ImageIO.read(new File(FileSystems.getDefault().getPath("ball4.png").toUri()));
 	     } catch (IOException e) {
 	         System.out.println("Image not found");
-	         pinguinright = new BufferedImage(40, 40, BufferedImage.TYPE_3BYTE_BGR);
-	         goalflag = new BufferedImage(40, 40, BufferedImage.TYPE_3BYTE_BGR);
-	         
 	     }
 		
 	}
@@ -130,20 +126,21 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 		
-		
+		//boll
 		g2.setColor(Color.BLUE);
 		g2.fill(ball = new Ellipse2D.Double(xball, yball, 20, 20));
 		g2.drawImage(ballimage, (int)xball, (int)yball, 21, 21, null);
-		//player 710, 520, 100, 60);
+		
+		//spelpjäs
 		g2.setColor(new Color(10, 34, 100));
 		g2.fill(player = new Rectangle((int)x, (int)y, 40, 40));
 		
-	//	pinguin = pinguinright;
 		g2.drawImage(pinguin, (int)x, (int)y, 40, 40, null);
 		g2.drawImage(goalflag, 705, 390, 70, 70, null);
 		g2.drawImage(flippedgoalflag, 70, 170, 70, 70, null);
 		g2.setColor(Color.MAGENTA);
-		//field
+		
+		//plan
 		g2.fill(rect2);
 		g2.fill(rect3);
 		g2.fill(rect4);
@@ -160,17 +157,12 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		g2.setColor(Color.WHITE);
 		g2.fill(rect15);
 		g2.setColor(color);
-		g2.fill(rect11);
-		//moving ball
-		
-		
-		
-		
+		g2.fill(rect11);	
 	}
+	//detta är "game-loopen", denna metod uppdateras hela tiden och kör spelet
 	public void actionPerformed(ActionEvent e)
-	{
-		
-		//yball == 541 && xball >= 650 && xball <= 710 && x >=70 && x <= 50 && y >= 170 && y <= 200
+	{	
+		//här ser kollar vi om vi vunnit spelet
 		if (x >= 70 && x<=140 && y >= 170 && y<=210 && xball >= 650 && xball <= 750 && yball >= 530 ) {
 			if (JOptionPane.showConfirmDialog(null, "Grattis du vann!  Vill du starta om?", "Victory", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION ) {
 				
@@ -179,12 +171,11 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
                 System.exit(0);
             }
 		}
+		//om vi trycker på r och vill restarta spelet
 		if(restart == true)
-		{
 			main.reset();
-		}
 
-		
+	//if satserna nedan kontrollerar att om vi kolliderar med bollen, väggar, om vi är i luften
 	if(ballPlayerCollision())
 	{	
 		velx = 0;
@@ -198,12 +189,8 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	if(playerInAir() == true && nextMove() == true)
 	{
 		velx = 0;
-	}
-	if(playerInAir() == true && nextMove() == true)
-	{
 		x = x;
 		y = y + vely;
-		
 	}
 	
 	hole();
@@ -242,19 +229,12 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	{
 		x = 0.0;
 	}
-	if(x > 760)
-	{
-		x = 760;
-	}
 	if(xball < 0.0)
 	{
 		xball = 0.0;
 	}
-	if(xball > 780)
-	{
-		xball = 780;
-	}
-	//facing player
+
+	//detta byteder bilden på spelaren så att rätt bild ritas upp när vi rör oss åt ett visst håll
 	if(velx >= 0 && facing == true)
 		pinguin = pinguinright;
 	if(velx <= 0 && facing == false)
@@ -264,6 +244,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	if(gravity < 0 && velx <= 0 && facing == false)
 		pinguin = pinguinflippedleft;
 	
+	//här byter vi bild på bollen 
 	if(velxball < 0.5 && velxball > -0.5)
 		ballimage = ballimage1;
 	if(velxball > 0)
@@ -279,7 +260,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		
 		counter = counter + 0.5;
 	}
-	
 	if(velxball < 0)
 	{
 		if(counter >= 0 && counter < 1)
@@ -296,10 +276,11 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	if(counter == 4)
 		counter = 0;
 	
-		
+	//ritar om banan 
 		repaint();
 	}
 	
+	//metoden som gör att vi kan hoppa om vi trycker på space
 	public void jump()
 	{
 		if(gravity > 0)
@@ -311,21 +292,21 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			vely = 5.0;
 		}
 	}
-	
+	//metoden som gör att vi kan röra oss åt vänster
 	public void left()
 	{
 		facing = false;
 		velx = -5.0;
 	}
+	//metoden som gör att vi kan röra oss åt höger
 	public void right()
 	{
 		facing = true;
 		velx = 5.0;
 	}
+	//vänder på gravitationen 
 	public void gravitySwitch()
 	{
-		
-		
 		if(gravity > 0)
 		{
 		gravity = -Math.abs(gravity);
@@ -335,98 +316,49 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		{
 			gravity = Math.abs(gravity);
 		color = Color.GREEN;
-		}
-		
+		}	
 	}
 
+	public void keyTyped(KeyEvent e) {}
 
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
+	//tittar om vi tryckt ner någon knapp
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
 		
 		if(playerInAir() == false)
 		{
 		if(e.getKeyCode() == KeyEvent.VK_SPACE)
-		{
 			jump();
-		}
-	 	
 	 	if(e.getKeyCode() == KeyEvent.VK_LEFT)
-		{
 			left();
-			
-			
-		}
 	 	if(e.getKeyCode() == KeyEvent.VK_RIGHT)
-		{
 			right();
-			
-		}
-	 	if(e.getKeyCode() == KeyEvent.VK_G)
-	 	{
-	 		gravitySwitch();
-	 	}
 		if(e.getKeyCode() == KeyEvent.VK_R)
-		{
-			//restart = true;
 			main.reset();
 		}
-		}
 	}
-
-	@Override
+	//tittar om vi släpper någon knapp
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-		if(e.getKeyCode() == KeyEvent.VK_R)
-		{
-			
-		}
+
 		if(e.getKeyCode() == KeyEvent.VK_UP)
-		{
 			vely = 0;
-			
-		}
 		if(e.getKeyCode() == KeyEvent.VK_DOWN)
-		{
 			vely = 0;
-			
-		}
-	
 		if(e.getKeyCode() == KeyEvent.VK_LEFT)
 		{
 		if(playerInAir() == false)
-		{
-		
 		velx = 0;
-			}
 			else
-			{
 				test = true;
-			}
 		}
-		
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT)
 		{
 			if(playerInAir() == false)
-			{
-		
 			velx = 0;
-			}
 			else
-			{
 				test = true;
-			}
 		}
-		
 	}
-	
+	//tittar om spelpjäsen är påväg att kollidera med någonting
 	public boolean nextMove()
 	{
 		double newx = x + velx;
@@ -443,7 +375,8 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		}
 		return false;	
 	}
-	
+	//kontrollerar om bollenkolliderar med en vägg samtdigt som spelpjäsen kolliderar med bollen
+	//detta för att förhindra att det går att trycka bollen genom en vägg
 	public boolean ballPlayerCollision()
 	{
 		double balldecider = 0;
@@ -467,10 +400,10 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			return true;
 		}
 		}
-			return false;
-		
+			return false;	
 	}
-	
+
+	//kontrollerar om spelare är i luften
 	public boolean playerInAir()
 	{
 		double decider = 0;
@@ -487,22 +420,19 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		for(Rectangle2D item : rectangles)
 		{
 		if(fakerect.getBounds2D().intersects(item.getBounds2D()))
-		{
-			
-			return false;
-			
+		{	
+			return false;	
 		}
-		
 		}
 		return true;
 	}
 	
+	//tittar om bollen är påväg att kollidera med något
 	public boolean nextBallMove()
 	{
 		double newx = xball + velxball;
 		double newy = yball + velyball;
 		Ellipse2D fakecircle = new Ellipse2D.Double( newx, newy, 20, 20);
-		
 		for(Rectangle2D item : rectangles)
 		{
 		if(fakecircle.getBounds2D().intersects(item.getBounds2D()))
@@ -512,8 +442,8 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		
 		}
 		return false;
-		
 	}
+	//tittar om bollen är på golvet
 	public boolean ballOnFloor()
 	{
 		friction = 0;
@@ -533,8 +463,8 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			}
 		}
 		return false;
-		
 	}
+	//hanterar spelpjäsen och bollen när de åker igenom de hål som finns i banan
 	public void hole()
 	{
 		if(x >= 460 && x <= 580 && y >=580 )
@@ -552,7 +482,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			velyball = 0;
 		
 		}
-		
 		if(xball >= 740 && yball >= 180 && yball <= 365)
 		{//770, 180, 30, 185);
 			gravitySwitch();
@@ -576,6 +505,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		}
 	}
 	
+	//kontrollerar om bollen studsar i någon vägg
 	public void horizontalBounce()
 	{
 		if(xball == xbound1 || xball == xbound2)
@@ -588,24 +518,16 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			{
 				velxball = -velxball;
 			}
-			
 		}
 	}
-
-	
-	
-
-	
+	//kontrollerar om bollen kolliderar med spelare och får då fart, här hanteras friktion och luftmotstånd på bollen
 	public void ballCollision()
 	{
-		
 		if(player.getBounds2D().intersects(ball.getBounds2D()))
 		{
 			velxball = fake;
 			xball = xball + velx;
-		}
-		
-		
+		}	
 		horizontalBounce();
 		if(velxball > 0)
 		{
@@ -618,14 +540,10 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			ballOnFloor();
 			velxball = velxball + friction/(massball)*dt;
 			xball += velxball*dt;
-			
 		}
 		if(ballOnFloor() == false && velxball != 0)
 		{
-			//luftmotstånd:
-			//F = (1/2)*C*p*A*v^2
-			//a = F/m
-			//används för att räkna ut vinkeln och friktionskraften
+			//luftmotstånd
 			velocity = Math.sqrt(Math.pow(velxball, 2) + Math.pow(velyball, 2));
 			angle = Math.acos(velxball/velocity);
 			//F = (1/2)*C*p*A*v^2
@@ -642,13 +560,9 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		}
 		 fake = velx;
 		}
-		
-	
-	
+	//kontrollerar gravitationen, att spelaren och bollen faller
 	public void fall()
 	{
-		
-	
 			vely += gravity;
 			velyball += gravity;
 			double fake = vely;
@@ -670,8 +584,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			{
 			vely = fake;	
 			}
-		
-		
 		if(nextBallMove() == true && velyball != 0 )
 		{
 			velyball = -fakeball+3;
@@ -681,6 +593,4 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			}
 		}
 	}
-
-	
 }

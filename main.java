@@ -9,17 +9,8 @@ import javax.swing.JFrame;
 		static JFrame f = new JFrame();
 		static TestJPanel t = new TestJPanel();
 
-
-		public static void setup(){
-
-			t.setBackground(new Color(10, 34, 100));
-			f.add(t);
-
-			f.setVisible(true);
-			f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			f.setSize(800, 600);
-		}
-		public static void reset(){
+		public static void reset()
+		{
 			t.restart = false;
 			t.x = 100;
 			t.y = 430;
@@ -32,8 +23,14 @@ import javax.swing.JFrame;
 			t.velxball = 0;
 			t.color = Color.GREEN;
 		}
+		
 		public static void main(String [] args)
 		{
-			setup();
+			t.setBackground(new Color(10, 34, 100));
+			f.add(t);
+			f.setVisible(true);
+			f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			f.setSize(800, 600);
+			f.setLocationRelativeTo(null);
 		}
 }
