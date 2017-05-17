@@ -27,7 +27,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	private Rectangle2D rect9 = new Rectangle(450, 65, 20, 300); //3
 	private Rectangle2D rect10 = new Rectangle(450, 365, 350, 20); //4
 	private Rectangle2D rect11 = new Rectangle(770, 180, 30, 185); //5
-	private Rectangle2D rect12 = new Rectangle(50, 150, 320, 20); //6
+	private Rectangle2D rect12 = new Rectangle(50, 150, 310, 20); //6
 	private Rectangle2D rect13 = new Rectangle(50, 410, 530, 20); //7
 	private Rectangle2D rect14 = new Rectangle(520, 520, 130, 60); //8
 	private Rectangle2D rect15 = new Rectangle(650, 560, 60, 20);
@@ -42,7 +42,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	private double friction = 0.4;
 	private double fake = 0;
 	private double dt = 0.5;
-	//F = (1/2)*C*p*A*v^2
+	//F = (1/2)*C*p*A*v
 	private double velocity = 0;
 	private double angle = 0;
 	private double forceair = 0;
@@ -104,6 +104,8 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		recthori[4] = rect7;
 		recthori[5] = rect14;
 		recthori[6] = rect16;
+		
+		//tar in bilderna
 		 try {
 			 goalflag = ImageIO.read(new File(FileSystems.getDefault().getPath("goalflag.png").toUri()));
 	         flippedgoalflag = ImageIO.read(new File(FileSystems.getDefault().getPath("flippedgoalflag.png").toUri()));
@@ -175,12 +177,13 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		if(restart == true)
 			main.reset();
 
+		
+		if(ballPlayerCollision() == true)
+		{
+			velx = 0;
+			vely = 0;
+		}
 	//if satserna nedan kontrollerar att om vi kolliderar med bollen, väggar, om vi är i luften
-	if(ballPlayerCollision())
-	{	
-		velx = 0;
-		velxball = 0;
-	}
 	if(playerInAir() == false && test == true)
 	{
 		velx = 0;
@@ -200,11 +203,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	{
 		x = x;
 		y = y;
-	}
-	else if(ballPlayerCollision() == true)
-	{
-		x = x;
-		xball = xball;
 	}
 	else
 	{
@@ -383,13 +381,13 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		double decider = 0;
 		if(velx > 0)
 		{
-		balldecider = xball - 2;
-		decider = x - 2;
+		balldecider = xball + 4;
+		decider = x + 2;
 		}
 		if(velx < 0)
 		{
-		balldecider = xball + 2;
-		decider = x + 2;
+		balldecider = xball - 4;
+		decider = x - 2;
 		}
 		Rectangle2D fakerect = new Rectangle((int) decider, (int) y , 40, 40);
 		Ellipse2D fakeball = new Ellipse2D.Double(balldecider, yball, 20, 20);
@@ -426,7 +424,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		}
 		return true;
 	}
-	
 	//tittar om bollen är påväg att kollidera med något
 	public boolean nextBallMove()
 	{
@@ -480,10 +477,9 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			xball = 750;
 			yball = -30;
 			velyball = 0;
-		
 		}
 		if(xball >= 740 && yball >= 180 && yball <= 365)
-		{//770, 180, 30, 185);
+		{
 			gravitySwitch();
 			velxball = 0;
 			xball = 5;
@@ -496,7 +492,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			xball = 110;
 			gravitySwitch();
 		}
-		//650, 560, 60, 20)
 		if(xball >= 650 && xball <= 710 && yball >=539 && yball < 540 && velyball == 0 && velxball == 0)
 		{
 			yball = 541;
@@ -523,6 +518,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	//kontrollerar om bollen kolliderar med spelare och får då fart, här hanteras friktion och luftmotstånd på bollen
 	public void ballCollision()
 	{
+		//spelaren puttar till bollen 
 		if(player.getBounds2D().intersects(ball.getBounds2D()))
 		{
 			velxball = fake;
@@ -554,18 +550,19 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			velyball = velyball - Math.sin(angle)*forceair*dt;
 			System.out.println(velxball);
 		}
+		//stannar bollen om den har låg hastighet
 		if(0.1 > velxball && velxball > -0.1)
 		{
 			velxball = 0;
 		}
 		 fake = velx;
 		}
+	
 	//kontrollerar gravitationen, att spelaren och bollen faller
 	public void fall()
 	{
 			vely += gravity;
 			velyball += gravity;
-			double fake = vely;
 			double fakeball = velyball;
 			if(vely >= maxvely)
 			{
@@ -580,13 +577,12 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			{
 				vely = 0;
 			}
-			if(nextMove() == true && playerInAir() == true)
-			{
-			vely = fake;	
-			}
+		//detta gör att bollen studsar tillbaka om den kommer med fart ner i golvet
 		if(nextBallMove() == true && velyball != 0 )
 		{
+			//tar bort liten del av hastigheten när den studsar i marken
 			velyball = -fakeball+3;
+			
 			if(velyball > 0.1 && velyball > -0.1)
 			{
 				velyball = 0;
