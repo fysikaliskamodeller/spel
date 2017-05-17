@@ -12,32 +12,30 @@ import java.nio.file.FileSystems;
 
 public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	
-	Timer t = new Timer(17, this);
+	Timer t = new Timer(15, this);
 	double x = 100, y = 435, velx = 0.0, vely = 0.0, xball = 200, yball = 430, velyball = 0.0, velxball = 0.0, xbound1 = 0.0, xbound2 = 780;
-	Rectangle2D [] rectangles = new Rectangle2D [14];
-	Rectangle2D [] recthori = new Rectangle2D [7];
+	Rectangle2D [] rectangles = new Rectangle2D [13];
+	Rectangle2D [] recthori = new Rectangle2D [6];
 	private Rectangle2D player = new Rectangle((int)x, (int)y, 40, 40);
 	private Rectangle2D rect2 = new Rectangle(600, 150, 300, 30); //floor middle
 	private Rectangle2D rect3 = new Rectangle(50, 520, 410, 60); //floor bottom
 	private Rectangle2D rect4 = new Rectangle(140, 0, 570, 20); // roof
-	private Rectangle2D rect5 = new Rectangle(730, 520, 100, 60);
 	private Rectangle2D rect7 = new Rectangle(30, 0, 20, 700); 
 	private Rectangle2D rect6 = new Rectangle(600, 65, 20, 60); //1
 	private Rectangle2D rect8 = new Rectangle(450, 65, 150, 20); //2
 	private Rectangle2D rect9 = new Rectangle(450, 65, 20, 300); //3
 	private Rectangle2D rect10 = new Rectangle(450, 365, 350, 20); //4
 	private Rectangle2D rect11 = new Rectangle(770, 180, 30, 185); //5
-	private Rectangle2D rect12 = new Rectangle(50, 150, 310, 20); //6
+	private Rectangle2D rect12 = new Rectangle(50, 150, 300, 20); //6
 	private Rectangle2D rect13 = new Rectangle(50, 410, 530, 20); //7
 	private Rectangle2D rect14 = new Rectangle(520, 520, 130, 60); //8
 	private Rectangle2D rect15 = new Rectangle(650, 560, 60, 20);
-	private Rectangle2D rect16 = new Rectangle(710, 460, 20, 150);
+	private Rectangle2D rect16 = new Rectangle(710, 370, 150, 250);
 
 	private Ellipse2D ball = new Ellipse2D.Double(yball, xball, 20, 20);
 
 	private double maxvely = 10;
 	public double gravity = 0.4;
-	private double massplayer = 50;
 	private double massball = 50;
 	private double friction = 0.4;
 	private double fake = 0;
@@ -50,7 +48,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	private double C = 0.02;
 	//luftdensitet
 	private double p = 0.1;
-	private BufferedImage[] playerimage = new BufferedImage[4];
 	
 	
 	
@@ -61,7 +58,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	private BufferedImage pinguinleft;
 	private BufferedImage pinguinflippedright;
 	private BufferedImage pinguinflippedleft;
-	private BufferedImage goalflag;
 	private BufferedImage flippedgoalflag;
 	private BufferedImage ballimage1;
 	private BufferedImage ballimage2;
@@ -84,7 +80,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		rectangles[0] = rect2;
 		rectangles[1] = rect3;
 		rectangles[2] = rect4;
-		rectangles[3] = rect5;
 		rectangles[4] = rect6;
 		rectangles[5] = rect7;
 		rectangles[6] = rect8;
@@ -94,20 +89,18 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		rectangles[10] = rect13;
 		rectangles[11] = rect14;
 		rectangles[12] = rect15;
-		rectangles[13] = rect16;
+		rectangles[3] = rect16;
 		
 		//horizontal 
 		recthori[0] = rect3;
-		recthori[1] = rect5;
 		recthori[2] = rect6;
 		recthori[3] = rect9;
 		recthori[4] = rect7;
 		recthori[5] = rect14;
-		recthori[6] = rect16;
+		recthori[1] = rect16;
 		
 		//tar in bilderna
 		 try {
-			 goalflag = ImageIO.read(new File(FileSystems.getDefault().getPath("goalflag.png").toUri()));
 	         flippedgoalflag = ImageIO.read(new File(FileSystems.getDefault().getPath("flippedgoalflag.png").toUri()));
 	         pinguinright = ImageIO.read(new File(FileSystems.getDefault().getPath("PinguinRight.png").toUri()));
 	         pinguinleft =  ImageIO.read(new File(FileSystems.getDefault().getPath("PinguinLeft.png").toUri()));
@@ -137,8 +130,8 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		g2.setColor(new Color(10, 34, 100));
 		g2.fill(player = new Rectangle((int)x, (int)y, 40, 40));
 		
+		//ritar ut pingvinen på spelpjäsen och ritar ut målflaggan
 		g2.drawImage(pinguin, (int)x, (int)y, 40, 40, null);
-		g2.drawImage(goalflag, 705, 390, 70, 70, null);
 		g2.drawImage(flippedgoalflag, 70, 170, 70, 70, null);
 		g2.setColor(Color.MAGENTA);
 		
@@ -146,7 +139,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		g2.fill(rect2);
 		g2.fill(rect3);
 		g2.fill(rect4);
-		g2.fill(rect5);
 		g2.fill(rect6);
 		g2.fill(rect7);
 		g2.fill(rect8);
@@ -157,8 +149,9 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 		g2.fill(rect14);
 		g2.fill(rect16);
 		g2.setColor(Color.WHITE);
-		g2.fill(rect15);
+		
 		g2.setColor(color);
+		g2.fill(rect15);
 		g2.fill(rect11);	
 	}
 	//detta är "game-loopen", denna metod uppdateras hela tiden och kör spelet
@@ -192,7 +185,6 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	if(playerInAir() == true && nextMove() == true)
 	{
 		velx = 0;
-		x = x;
 		y = y + vely;
 	}
 	
@@ -536,7 +528,14 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			ballOnFloor();
 			velxball = velxball + friction/(massball)*dt;
 			xball += velxball*dt;
+		}	
+		
+		//stannar bollen om den har låg hastighet
+		if(0.1 > velxball && velxball > -0.1)
+		{
+			velxball = 0;
 		}
+		
 		if(ballOnFloor() == false && velxball != 0)
 		{
 			//luftmotstånd
@@ -548,13 +547,8 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 			
 			velxball = velxball - Math.cos(angle)*forceair*dt;
 			velyball = velyball - Math.sin(angle)*forceair*dt;
-			System.out.println(velxball);
 		}
-		//stannar bollen om den har låg hastighet
-		if(0.1 > velxball && velxball > -0.1)
-		{
-			velxball = 0;
-		}
+		
 		 fake = velx;
 		}
 	
