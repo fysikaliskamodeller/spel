@@ -21,7 +21,7 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	private Rectangle2D rect3 = new Rectangle(50, 520, 410, 60); //floor bottom
 	private Rectangle2D rect4 = new Rectangle(140, 0, 570, 20); // roof
 	private Rectangle2D rect5 = new Rectangle(730, 520, 100, 60);
-	private Rectangle2D rect7 = new Rectangle(30, 0, 40, 700); 
+	private Rectangle2D rect7 = new Rectangle(30, 0, 20, 700); 
 	private Rectangle2D rect6 = new Rectangle(600, 65, 20, 60); //1
 	private Rectangle2D rect8 = new Rectangle(450, 65, 150, 20); //2
 	private Rectangle2D rect9 = new Rectangle(450, 65, 20, 300); //3
@@ -225,13 +225,13 @@ public class TestJPanel extends JPanel implements KeyListener, ActionListener{
 	fall();
 	
 	
-	if(x < 0.0) //dessa håller spelaren och bollen på banan
+	if(x > 760) //dessa håller spelaren och bollen på banan
 	{
-		x = 0.0;
+		x = 760;
 	}
-	if(xball < 0.0)
+	if(xball > 780)
 	{
-		xball = 0.0;
+		xball = 780;
 	}
 
 	//detta byteder bilden på spelaren så att rätt bild ritas upp när vi rör oss åt ett visst håll
